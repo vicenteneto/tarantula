@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 class UsersController < ApplicationController
   before_filter :get_tags_offset_and_filter, :only => [:index]
 
@@ -25,28 +24,28 @@ class UsersController < ApplicationController
   def index
 
     if params[:project_id] and
-        (@current_user.admin? or @current_user.project_ids.include?(params[:project_id].to_i))
+    (@current_user.admin? or @current_user.project_ids.include?(params[:project_id].to_i))
       p_id = params[:project_id]
       p_id = @project.id if p_id == 'current'
       active = User.all(
-                        :select => 'id, login, deleted, realname',
-                        :include => :projects,
-                        :conditions => ["project_assignments.group IN \
+      :select => 'id, login, deleted, realname',
+      :include => :projects,
+      :conditions => ["project_assignments.group IN \
                                         (#{User::Groups.values.map{|s|"'#{s}'"}.join(',')}) AND projects.id = ? \
                                         AND users.deleted = 0 AND users.login LIKE ? ",
-                                        p_id, "%#{@filter}%"]
-                        )
+        p_id, "%#{@filter}%"]
+    )
     elsif (@current_user.admin?)
       active = User.all(
-                        :select => 'id, login, deleted, realname',
-                        :conditions => ["deleted=0 AND login LIKE ? ",
-                                        "%#{@filter}%"])
+      :select => 'id, login, deleted, realname',
+      :conditions => ["deleted=0 AND login LIKE ? ",
+        "%#{@filter}%"])
     else
-      # Users in same projects
+    # Users in same projects
       active = User.all(
-                        :select => 'id, login, deleted, realname',
-                        :include => :projects,
-                        :conditions => ["users.deleted=0 AND projects.id IN \
+      :select => 'id, login, deleted, realname',
+      :include => :projects,
+      :conditions => ["users.deleted=0 AND projects.id IN \
                                         (#{@current_user.project_ids.join(',')}) \
                                         AND users.login LIKE ? ", "%#{@filter}%"])
     end
@@ -59,15 +58,15 @@ class UsersController < ApplicationController
       p_id = params[:project_id]
       p_id = @project.id if p_id == 'current'
       deleted = User.all(
-                         :select => 'id, login, deleted, realname',
-                         :include => :projects,
-                         :conditions => {
-                           'users.deleted' => true,
-                           'projects.id' => p_id
-                         })
+      :select => 'id, login, deleted, realname',
+      :include => :projects,
+      :conditions => {
+        'users.deleted' => true,
+        'projects.id' => p_id
+      })
     else
       deleted = User.all(:select => 'id, login, deleted, realname',
-                         :conditions => {:deleted => true})
+      :conditions => {:deleted => true})
     end
 
     render :json => deleted.map{|d| d.to_tree}
@@ -106,15 +105,15 @@ class UsersController < ApplicationController
   def show
     @user = User.find(params[:id])
     raise "Permission denied." unless \
-      ((@current_user.projects & @user.projects).size >= 1 or @current_user.admin?)
+    ((@current_user.projects & @user.projects).size >= 1 or @current_user.admin?)
     render :json => {:data => [@user.to_data]}
   end
 
   #  PUT /users/:id
   def update
     raise "Permission denied." unless \
-      ((@current_user.id == params[:id].to_i) or @current_user.admin?)
-    
+    ((@current_user.id == params[:id].to_i) or @current_user.admin?)
+
     @user = User.find(params[:id])
     if @current_user.admin?
       @user.remove_admin_assignments if @user.admin? and @data['admin'] == 0
@@ -159,12 +158,12 @@ class UsersController < ApplicationController
   end
 
   private
+
   # Convert user id parameter
   def get_user
     if (params[:id] == 'current')
       params[:id] = @current_user.id
     end
   end
-
 
 end

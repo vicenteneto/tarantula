@@ -151,5 +151,8 @@ Tarantula::Application.routes do
   resources :csv_exports, :only => [:new, :create]
   resources :csv_imports, :only => [:new, :create]
 
-  match '/api/test', :controller => 'api', :action => 'test', :via => :get
+  match '/api/users', :controller => 'api', :action => 'create_user', :via => :post
+
+  match '/api/projects', :controller => 'api', :action => 'create_project', :via => :post
+  match '/api/projects/:id', :controller => 'api', :action => 'view_project', :via => :get
 end

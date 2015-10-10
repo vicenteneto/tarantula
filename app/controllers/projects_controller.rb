@@ -20,9 +20,9 @@ class ProjectsController < ApplicationController
     conds += " AND name LIKE '%#{@filter}%'" if @filter
 
     if (@current_user.admin?)
-        projects = Project.find(:all, :conditions => conds)
+      projects = Project.find(:all, :conditions => conds)
     else
-        projects = @current_user.projects.find(:all, :conditions => conds)
+      projects = @current_user.projects.find(:all, :conditions => conds)
     end
 
     data = projects.map do |p|
@@ -43,13 +43,13 @@ class ProjectsController < ApplicationController
       @project = Project.find(params[:id])
       @project.purge!
       render :nothing => true, :status => :ok
-      return
+    return
     end
 
     if (@current_user.admin?)
       projects = Project.find(:all, :conditions => {:deleted => 1})
     else
-      projects = @current_user.projects.deleted
+    projects = @current_user.projects.deleted
     end
 
     render :json => projects.map(&:to_tree)
@@ -67,7 +67,7 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    @project = Project.find(params[:id])
+     @project = Project.find(params[:id])
 
     render :json => {:data => [@project.to_data]}
   end
@@ -94,7 +94,7 @@ class ProjectsController < ApplicationController
     bug_products = @data.delete('bug_products')
 
     @project.update_with_assignments!(@current_user, @data, assigned_users,
-                                      test_areas, bug_products)
+    test_areas, bug_products)
 
     render :json => @project.id, :status => :ok
   end
@@ -104,7 +104,7 @@ class ProjectsController < ApplicationController
     ok = false
     @project = Project.find(params[:id])
     if (@project.toggle!(:deleted))
-      ok = true
+    ok = true
     end
     #render :json => "{\"status\":#{ok}}"
     render :json => @project.id, :status => :ok
@@ -120,9 +120,9 @@ class ProjectsController < ApplicationController
     raise "Project has no bug tracker!" unless bt
 
     if ta = @current_user.test_area(project) and ta.forced
-      products = ta.bug_products
+    products = ta.bug_products
     else
-      products = project.bug_products
+    products = project.bug_products
     end
 
     render :json => {:data => products.map(&:to_data)}
